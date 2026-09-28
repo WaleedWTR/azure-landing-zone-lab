@@ -1,0 +1,29 @@
+name: Landing zone validation
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  bicep:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Lint Bicep
+        uses: azure/cli@v2
+        with:
+          inlineScript: az bicep lint --file infrastructure/main.bicep
+      - name: Build Bicep
+        uses: azure/cli@v2
+        with:
+          inlineScript: az bicep build --file infrastructure/main.bicep
+
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install pytest
+      - run: python -m pytest -q
